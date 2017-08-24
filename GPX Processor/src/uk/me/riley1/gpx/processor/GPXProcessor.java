@@ -1,7 +1,11 @@
 package uk.me.riley1.gpx.processor;
 
 import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 
