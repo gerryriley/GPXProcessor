@@ -17,18 +17,18 @@ public class GPXRoute {
 	
 	public void addMarkers(UnitConverter converter) {
 		
-		int miles = 0;
-		double aMile = 0L;
+		int markerDistance = 0;
+		double distance = 0L;
 		GPXWayPoints wayPoints = getWayPoints();
 		GPXWayPoint fromPt = wayPoints.getFirstWayPoint();
 		GPXWayPoint toPt = wayPoints.getNextWayPoint();
 		while (fromPt != null && toPt != null) {
-			aMile += fromPt.getDBP(toPt);
-			if (aMile > 1) {
+			distance += fromPt.getDBP(toPt);
+			if (distance > 1) {
 				//We have a mile so lets change previous point
-				miles++;
-				aMile-= 1;
-				fromPt.addMarker(miles);
+				markerDistance++;
+				distance-= 1;
+				fromPt.addMarker(markerDistance);
 			}
 			fromPt = toPt;
 			toPt = wayPoints.getNextWayPoint();
