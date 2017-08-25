@@ -54,7 +54,7 @@ public class GPXProcessor {
 	}
 	
 	public GPXProcessor addMarkers(boolean forward) throws InvalidAttributesException {
-		addMarkers(new UnitConverter(UnitConverter.MILES, 1), forward);
+		addMarkers(UnitConverter.MILES, forward);
 		return this;
 	}
 	

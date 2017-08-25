@@ -65,8 +65,8 @@ public class GPXWayPoint {
 		distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 6371e3;
 	
 		try {
-			UnitConverter conv = new UnitConverter(UnitConverter.METERS, distance);
-			conv.setUnit(UnitConverter.MILES);
+			UnitC conv = new UnitC(UnitC.METERS, distance);
+			conv.setUnit(UnitC.MILES);
 			distance = conv.convert();
 			
 		} catch (InvalidAttributesException e) {
