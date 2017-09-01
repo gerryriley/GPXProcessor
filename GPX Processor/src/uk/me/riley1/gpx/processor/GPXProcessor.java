@@ -26,6 +26,7 @@ public class GPXProcessor {
 	
 	private Document gpxDoc;
 	private NodeList routes;
+	private static int INTERVAL_BETWEEN_MARKERS = 1
 	public static String ROUTE = "rte";
 	public static String WAYPOINT = "rtept";
 	public static String WP_NAME = "name";
@@ -54,7 +55,10 @@ public class GPXProcessor {
 	}
 	
 	public GPXProcessor addMarkers(boolean forward) throws InvalidAttributesException {
-		addMarkers(UnitConverter.MILES, forward);
+		
+		UnitConverter conv = UnitConverter.MILES;
+		conv.normalize((double) INTERVAL_BETWEEN_MARKERS);
+		addMarkers(conv, forward);
 		return this;
 	}
 	

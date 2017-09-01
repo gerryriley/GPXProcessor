@@ -1,13 +1,14 @@
 package uk.me.riley1.gpx.processor;
 
-import javax.naming.directory.InvalidAttributesException;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 
 public class GPXWayPoint {
 	
+	private static final double RADIUS_OF_EARTH = 6371e3;
+	private static final String MARKER_SYMBOL = "Pin";
+	private static final String NORMAL_SYMBOL = "TinyDot";
 	private Element Element;
 	private boolean forward;
 
@@ -17,29 +18,11 @@ public class GPXWayPoint {
 		this.forward = forward;				
 	}
 
-	public void addMarker(int miles) {
-		
-		Element wpName = (Element) getElement().getElementsByTagName(GPXProcessor.WP_NAME).item(0);
-		Node text = wpName.getFirstChild();
-		String name = text.getNodeValue();
-		name = " Mile";
-		if (miles > 1) {
-			name+= "s";
-		}
-		text.setNodeValue(String.valueOf(miles) + name);
-		Element sym = (Element) getElement().getElementsByTagName(GPXProcessor.WP_SYM).item(0);
-		text = sym.getFirstChild();
-		text.setNodeValue("Pin");
-	}
-
-	public Element getElement() {
-		return Element;
-	}
-
-	public boolean isForward() {
-		return forward;
-	}
-
+	/**
+	 * Returns the distance between this and another geographic point in meters
+	 * @param otherPoint the distance is calculated from this point to the other {@link GPXWayPoint}
+	 * @return a double representing the distance between this and the other {@link GPXWayPoint}
+	 */
 	public double getDBP(GPXWayPoint otherPoint) {
 		
 		Element fromPt = getElement();
@@ -62,33 +45,54 @@ public class GPXWayPoint {
 		        Math.cos(lat1r) * Math.cos(lat2r) *
 		        Math.sin(deltaLon/2) * Math.sin(deltaLon)/2;
 		
-		distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 6371e3;
-	
-		try {
-			UnitC conv = new UnitC(UnitC.METERS, distance);
-			conv.setUnit(UnitC.MILES);
-			distance = conv.convert();
+		distance = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * RADIUS_OF_EARTH;
 			
-		} catch (InvalidAttributesException e) {
-
-			e.printStackTrace();
-		}
 		return distance;
+	}
+
+	public void addMarker(int pointInterval, UnitConverter conv) {
+		
+		String name = " " + conv.getName();
+		if (pointInterval > 1) {
+			name+= "s";
+		}
+		UpdatePoint(name, MARKER_SYMBOL);
 	}
 
 	public void removeMarker() {
 		
 		Element sym = (Element) getElement().getElementsByTagName(GPXProcessor.WP_SYM).item(0);
 		Node text = sym.getFirstChild();
-		String s = "Pin";
-		if (s.equalsIgnoreCase(text.getNodeValue())) {
-			text.setNodeValue("TinyDot");
-		
-			Element wpName = (Element) getElement().getElementsByTagName(GPXProcessor.WP_NAME).item(0);
-			text = wpName.getFirstChild();
-			text.setNodeValue("XXX");
+		if (MARKER_SYMBOL.equalsIgnoreCase(text.getNodeValue())) {
+			UpdatePoint("XXX", NORMAL_SYMBOL);;
 		}
+	}
+	
+	public void UpdatePoint(String name, String symbolName) {
 		
+		if (name != null) {
+			Element wpName = (Element) getElement().getElementsByTagName(GPXProcessor.WP_NAME).item(0);
+			Node text = wpName.getFirstChild();
+			text.setNodeValue(name);
+		}
+		if (symbolName != null) {
+			Element sym = (Element) getElement().getElementsByTagName(GPXProcessor.WP_SYM).item(0);
+			Node text = sym.getFirstChild();
+			text.setNodeValue(symbolName);
+		}
 	}
 
+	public void insertWaypoint(GPXWayPoint otherPoint, double distance, UnitConverter converter) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	public Element getElement() {
+		return Element;
+	}
+
+	public boolean isForward() {
+		return forward;
+	}
 }

@@ -4,6 +4,7 @@ import org.w3c.dom.Element;
 
 public class GPXRoute {
 	
+	private static final double MAX_OVERSHOOT = 100L;
 	private Element thisElement;
 	private boolean forward;
 	private GPXWayPoints wayPoints;
@@ -15,6 +16,7 @@ public class GPXRoute {
 		wayPoints = new GPXWayPoints(this);
 	}
 	
+	
 	public void addMarkers(UnitConverter converter) {
 		
 		int markerDistance = 0;
@@ -24,11 +26,21 @@ public class GPXRoute {
 		GPXWayPoint toPt = wayPoints.getNextWayPoint();
 		while (fromPt != null && toPt != null) {
 			distance += fromPt.getDBP(toPt);
-			if (distance > 1) {
-				//We have a mile so lets change previous point
-				markerDistance++;
-				distance-= 1;
-				fromPt.addMarker(markerDistance);
+			if (distance > converter.getValue()) { // This is the unit value in meters.
+				
+				//We have at reached or exceeded the specified distance so lets change previous point
+				markerDistance += converter.convert();	// increment the distance by the value of the specified unit
+				distance -= converter.getValue();
+				
+				if (distance > MAX_OVERSHOOT) {
+					
+					fromPt.insertWaypoint(toPt, distance, converter);
+				}
+				
+				else {
+					
+					fromPt.addMarker(markerDistance, converter);
+				}
 			}
 			fromPt = toPt;
 			toPt = wayPoints.getNextWayPoint();
