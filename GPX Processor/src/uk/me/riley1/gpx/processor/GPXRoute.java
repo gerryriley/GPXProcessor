@@ -25,7 +25,7 @@ public class GPXRoute {
 		GPXWayPoint fromPt = wayPoints.getFirstWayPoint();
 		GPXWayPoint toPt = wayPoints.getNextWayPoint();
 		while (fromPt != null && toPt != null) {
-			distance += fromPt.getDBP(toPt);
+			distance += fromPt.getDistanceBetweenPoints(toPt);
 			if (distance > converter.getValue()) { // This is the unit value in meters.
 				
 				//We have at reached or exceeded the specified distance so lets change previous point

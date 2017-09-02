@@ -26,7 +26,7 @@ public class GPXProcessor {
 	
 	private Document gpxDoc;
 	private NodeList routes;
-	private static int INTERVAL_BETWEEN_MARKERS = 1
+	private static int INTERVAL_BETWEEN_MARKERS = 1;
 	public static String ROUTE = "rte";
 	public static String WAYPOINT = "rtept";
 	public static String WP_NAME = "name";
