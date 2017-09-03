@@ -1,7 +1,6 @@
 package uk.me.riley1.gpx.processor;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -11,7 +10,6 @@ public class GPXWayPoint {
 	private static final double RADIUS_OF_EARTH = 6371e3;
 	private static final String MARKER_SYMBOL = "Pin";
 	private static final String NORMAL_SYMBOL = "TinyDot";
-	private static final int DEGREES_IN_A_CIRCLE = 360;
 	private Element Element;
 	private boolean forward;
 
@@ -90,19 +88,18 @@ public class GPXWayPoint {
 	
 	Coordinates getDestPoint(GPXWayPoint otherPoint, double distance) {
 		
-		final int lat = 0;
-		final int lon = 1;
 		Element fromPt = getElement();
 		double lat1 = Double.parseDouble(fromPt.getAttribute("lat"));
 		double lon1 = Double.parseDouble(fromPt.getAttribute("lon"));
 		double lat1r = Math.toRadians(lat1);
 		double lon1r = Math.toRadians(lon1);
 		double brng = getBearingBetweenPoints(otherPoint);
+		double angularDist = distance/RADIUS_OF_EARTH;
 		
-		double lat2 = Math.asin( Math.sin(lat1r)*Math.cos(distance/RADIUS_OF_EARTH) +
-                Math.cos(lat1r)*Math.sin(distance/RADIUS_OF_EARTH)*Math.cos(brng) );
-		double lon2 = lon1r + Math.atan2(Math.sin(brng)*Math.sin(distance/RADIUS_OF_EARTH)*Math.cos(lat1r),
-                     Math.cos(distance/RADIUS_OF_EARTH)-Math.sin(lat1r)*Math.sin(lat2));
+		double lat2 = Math.asin( Math.sin(lat1r)*Math.cos(angularDist) +
+                Math.cos(lat1r)*Math.sin(angularDist)*Math.cos(brng) );
+		double lon2 = lon1r + Math.atan2(Math.sin(brng)*Math.sin(angularDist)*Math.cos(lat1r),
+                     Math.cos(angularDist)-Math.sin(lat1r)*Math.sin(lat2));
 		lon2 = Math.toDegrees(lon2);
 		lon2 = (lon2+540) % 360-180;
 		
@@ -111,9 +108,9 @@ public class GPXWayPoint {
 		
 	}
 
-	public void addMarker(int pointInterval, UnitConverter conv) {
+	public void addMarker(double pointInterval, UnitConverter conv) {
 		
-		String name = " " + conv.getName();
+		String name = String.valueOf(pointInterval) + " " + conv.getName();
 		if (pointInterval > 1) {
 			name+= "s";
 		}
@@ -124,14 +121,14 @@ public class GPXWayPoint {
 		
 		Element sym = (Element) getElement().getElementsByTagName(GPXProcessor.WP_SYM).item(0);
 		Node text = sym.getFirstChild();
-		if (MARKER_SYMBOL.equalsIgnoreCase(text.getNodeValue())) {
-			UpdatePoint("XXX", NORMAL_SYMBOL);;
+		if (!NORMAL_SYMBOL.equalsIgnoreCase(text.getNodeValue())) {
+			UpdatePoint("Mark", NORMAL_SYMBOL);
 		}
 	}
 
-	public GPXWayPoint createNewWaypoint(GPXWayPoint otherPoint, double distance, int pointInterval, UnitConverter converter) {
+	public GPXWayPoint createNewWaypoint(GPXWayPoint otherPoint, double pointInterval, double distance, UnitConverter converter) {
 		
-		Coordinates coords = getDestPoint(otherPoint, distance);
+		Coordinates coords = otherPoint.getDestPoint(this, distance);
 
 		Element wpElem = (Element) getElement().cloneNode(true);
 		GPXWayPoint newWayPoint = new GPXWayPoint(wpElem, this.forward);
@@ -141,7 +138,7 @@ public class GPXWayPoint {
 		latAttrib.setValue(String.valueOf(coords.latitude));
 		lonAttrib.setValue(String.valueOf(coords.longitude));
 		
-		String name = " " + converter.getName();
+		String name = String.valueOf(pointInterval) + " " + converter.getName();
 		if (pointInterval > 1) {
 			name+= "s";
 		}

@@ -42,7 +42,6 @@ public class GPXProcessor {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		gpxDoc = builder.parse(file);
 		routes = gpxDoc.getElementsByTagName(ROUTE);
-		routes = gpxDoc.getElementsByTagName(ROUTE);
 	}
 
 	public NodeList getRoutes() {
