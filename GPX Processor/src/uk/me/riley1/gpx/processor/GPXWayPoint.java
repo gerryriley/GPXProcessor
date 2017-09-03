@@ -1,5 +1,6 @@
 package uk.me.riley1.gpx.processor;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -87,12 +88,11 @@ public class GPXWayPoint {
 		return brng;
 	}
 	
-	double[] getDestPoint(GPXWayPoint otherPoint, double distance) {
+	Coordinates getDestPoint(GPXWayPoint otherPoint, double distance) {
 		
 		final int lat = 0;
 		final int lon = 1;
 		Element fromPt = getElement();
-		double[] result = new double[2];
 		double lat1 = Double.parseDouble(fromPt.getAttribute("lat"));
 		double lon1 = Double.parseDouble(fromPt.getAttribute("lon"));
 		double lat1r = Math.toRadians(lat1);
@@ -106,9 +106,7 @@ public class GPXWayPoint {
 		lon2 = Math.toDegrees(lon2);
 		lon2 = (lon2+540) % 360-180;
 		
-		result[lat] = Math.toDegrees(lat2);
-		result[lon] = lon2;
-		
+		Coordinates result = new Coordinates(Math.toDegrees(lat2), lon2);
 		return result;
 		
 	}
@@ -130,6 +128,28 @@ public class GPXWayPoint {
 			UpdatePoint("XXX", NORMAL_SYMBOL);;
 		}
 	}
+
+	public GPXWayPoint createNewWaypoint(GPXWayPoint otherPoint, double distance, int pointInterval, UnitConverter converter) {
+		
+		Coordinates coords = getDestPoint(otherPoint, distance);
+
+		Element wpElem = (Element) getElement().cloneNode(true);
+		GPXWayPoint newWayPoint = new GPXWayPoint(wpElem, this.forward);
+		
+		Attr latAttrib = wpElem.getAttributeNode("lat");
+		Attr lonAttrib = wpElem.getAttributeNode("lon");
+		latAttrib.setValue(String.valueOf(coords.latitude));
+		lonAttrib.setValue(String.valueOf(coords.longitude));
+		
+		String name = " " + converter.getName();
+		if (pointInterval > 1) {
+			name+= "s";
+		}
+
+		newWayPoint.UpdatePoint(name, MARKER_SYMBOL);
+		
+		return newWayPoint;
+	}
 	
 	/**
 	 * Updates to parameters in this GPXWaypoint
@@ -149,17 +169,6 @@ public class GPXWayPoint {
 			text.setNodeValue(symbolName);
 		}
 	}
-
-	public void insertWaypoint(GPXWayPoint otherPoint, double distance, UnitConverter converter) {
-		
-		double brng = getBearingBetweenPoints(otherPoint);
-		double lat = 
-		
-		Document doc = getElement().getOwnerDocument();
-		Element NewWaypoint = (Element) getElement().cloneNode(true);
-		
-		
-	}
 	
 	
 	public Element getElement() {
@@ -168,5 +177,16 @@ public class GPXWayPoint {
 
 	public boolean isForward() {
 		return forward;
+	}
+	
+	class Coordinates {
+		
+		double latitude = 0;
+		double longitude = 0;
+		
+		Coordinates(double lat, double lon) {
+			latitude = lat;
+			longitude = lon;
+		}
 	}
 }

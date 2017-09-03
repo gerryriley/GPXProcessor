@@ -11,8 +11,8 @@ public class GPXWayPoints {
 
 	public GPXWayPoints(GPXRoute route) {
 		this.route = route;
-		route.getElement();
 		nodeList = route.getElement().getElementsByTagName(GPXProcessor.WAYPOINT);
+		index = route.isForward() ? 0 : nodeList.getLength() - 1;
 	}
 	
 	public GPXWayPoint getFirstWayPoint() {
@@ -30,6 +30,11 @@ public class GPXWayPoints {
 			index = route.isForward() ? ++index : --index;
 		}
 		return wayPoint;
+	}
+
+	public void insertWaypoint(GPXWayPoint newPt, GPXWayPoint refPt) {
+	
+		route.getElement().insertBefore(newPt.getElement(), refPt.getElement());
 	}
 	
 

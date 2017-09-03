@@ -34,7 +34,13 @@ public class GPXRoute {
 				
 				if (distance > MAX_OVERSHOOT) {
 					
-					fromPt.insertWaypoint(toPt, distance, converter);
+					GPXWayPoint newPt = fromPt.createNewWaypoint(toPt, distance, markerDistance, converter);
+					if (forward) {
+						wayPoints.insertWaypoint(newPt, toPt);
+					}
+					else {
+						wayPoints.insertWaypoint(newPt, fromPt);
+					}
 				}
 				
 				else {
