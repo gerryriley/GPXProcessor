@@ -1,4 +1,4 @@
-package uk.me.riley1.gpx.processor;
+package uk.me.riley1.gpx.processor.core;
 
 import java.io.File;
 

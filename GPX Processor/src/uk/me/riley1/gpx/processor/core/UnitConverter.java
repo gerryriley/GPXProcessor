@@ -1,4 +1,4 @@
-package uk.me.riley1.gpx.processor;
+package uk.me.riley1.gpx.processor.core;
 
 public enum UnitConverter {
 	 MILES("Mile", 0.000621f), KM("Kilometer", 0.001f), METERS("Meters", 1), FEET("Feet",3.28084f ),
