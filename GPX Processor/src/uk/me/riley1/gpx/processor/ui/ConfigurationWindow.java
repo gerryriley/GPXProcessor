@@ -4,24 +4,15 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import java.awt.BorderLayout;
 import java.awt.Font;
 import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
 import javax.swing.JComboBox;
-import java.awt.Insets;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Component;
-import javax.swing.JTextField;
 import javax.swing.JButton;
-import java.awt.Color;
 import javax.swing.UIManager;
 
-import com.sun.java.swing.plaf.windows.resources.windows;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -62,7 +53,6 @@ public class ConfigurationWindow {
 		frmGpxFileAdd.getContentPane().setFont(new Font("Arial", Font.BOLD, 16));
 		frmGpxFileAdd.setBounds(100, 100, 525, 376);
 		frmGpxFileAdd.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmGpxFileAdd.getContentPane().setLayout(new GridLayout(1, 1, 0, 0));
 		
 		JPanel panel = new JPanel();
 		panel.setPreferredSize(new Dimension(31, 100));
