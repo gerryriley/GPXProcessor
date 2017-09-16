@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import uk.me.riley1.gpx.processor.core.*;
 
@@ -189,6 +190,9 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		int retVal = 0;
 		if (e.getSource().equals(cbFileName)) {
 			JFileChooser fC = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+			        "GPX Files", "gpx");
+			fC.setFileFilter(filter);
 			fC.addActionListener(this);
 			retVal = fC.showDialog(cbFileName, "Select File");
 			if (retVal == JFileChooser.APPROVE_OPTION) {
