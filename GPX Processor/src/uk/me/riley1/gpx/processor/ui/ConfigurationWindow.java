@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
@@ -23,7 +25,9 @@ import uk.me.riley1.gpx.processor.core.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import java.awt.SystemColor;
@@ -44,11 +48,16 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				
+				ConfigurationWindow window = null;
 				try {
-					ConfigurationWindow window = new ConfigurationWindow();
+					
+					window = new ConfigurationWindow();
+					window.initialize();
 					window.frmGpxFileAdd.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					
+					window.displayException(e);;
 				}
 			}
 		});
@@ -58,7 +67,7 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 	 * Create the application.
 	 */
 	public ConfigurationWindow() {
-		initialize();
+		
 	}
 
 	/**
@@ -127,6 +136,9 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		
 		
 		btnAddMarkers = new JButton("Add Markers");
+		btnAddMarkers.setToolTipText("<html>Starts adding markers to the selected file at the specified intervals and<br/>"
+				+ "starting at the beginning of a route or the end depending on whether<br/>"
+				+ "direction is Forwards or Backwards</html>");
 		btnAddMarkers.setEnabled(false);
 		btnAddMarkers.addActionListener(this);
 		btnAddMarkers.setFont(new Font("Arial", Font.BOLD, 12));
@@ -136,7 +148,7 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		panel.add(btnAddMarkers);
 		
 		btnCancel = new JButton("Cancel");
-		btnCancel.setToolTipText("Starts adding markers to the selected file at the specified intervalues and starting at the beginning of a route or the end depending on whether direction is Forwards or Backwards");
+		btnCancel.setToolTipText("Cancel this Operation");
 		btnCancel.addActionListener(this);
 		btnCancel.setFont(new Font("Arial", Font.BOLD, 12));
 		btnCancel.setForeground(SystemColor.textText);
@@ -168,8 +180,43 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 	}
 
 	private void doAddMarkers() {
-		// TODO Auto-generated method stub
+
+		File file = new File((String) cbFileName.getSelectedItem());
+		try {
+			GPXProcessor proc = new GPXProcessor(file);
+			proc.setDirection((String) cbDirection.getSelectedItem());
+			proc.setMarkerInterval(Double.parseDouble(tfDistance.getText()));
+			proc.setIntervalUnit((UnitConverter) cbDistanceUnit.getSelectedItem());
+			proc.removeMarkers();
+			proc.addMarkers();
+			proc.generateOutput();
+
+		}
+		catch (Exception e) {
+			displayException(e);
+		}
+	}
+
+	protected void displayException(Exception e) {
 		
+		Object[] options = {"OK", "Show Exception"};
+		int n = JOptionPane.showOptionDialog(frmGpxFileAdd,
+		"An Error has Occurred while processing your file:\n\n" + 
+				e.getLocalizedMessage(),
+		"Error",
+		JOptionPane.YES_NO_OPTION,
+		JOptionPane.ERROR_MESSAGE,
+		null,     //do not use a custom Icon
+		options,  //the titles of buttons
+		options[0]); //default button title
+		
+		if (n == 1) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		    PrintStream ps = new PrintStream(baos);
+		    e.printStackTrace(ps);
+			JOptionPane.showMessageDialog(frmGpxFileAdd, baos.toString(), 
+					"Full Error Stack Trace",JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	

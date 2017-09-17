@@ -11,16 +11,17 @@ public class GPXProcessorMain {
 		}
 		String fileName = args[0];
 		File file = new File(fileName);
-		Boolean forward = false;
+		String direction = "backward";
 		if (args.length > 1) {
-			forward = args[1].equalsIgnoreCase("forward");
+			direction = args[1];
 		}
 		GPXProcessor proc;
 		try {
 			proc = new GPXProcessor(file);
+			proc.setDirection(direction);
 			proc.removeMarkers();
-			proc.addMarkers(forward);
-			proc.generateOutput(file);
+			proc.addMarkers();
+			proc.generateOutput();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}

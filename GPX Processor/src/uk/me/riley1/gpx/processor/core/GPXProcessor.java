@@ -1,15 +1,11 @@
 package uk.me.riley1.gpx.processor.core;
 
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 
-import javax.naming.directory.InvalidAttributesException;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.*;
 import javax.xml.transform.Result;
@@ -26,7 +22,10 @@ public class GPXProcessor {
 	
 	private Document gpxDoc;
 	private NodeList routes;
-	private static int INTERVAL_BETWEEN_MARKERS = 1;
+	private String direction = "backward";
+	private File file;
+	private double markerInterval = 1;
+	private UnitConverter intervalUnit = UnitConverter.MILES;
 	public static String ROUTE = "rte";
 	public static String WAYPOINT = "rtept";
 	public static String WP_NAME = "name";
@@ -40,6 +39,7 @@ public class GPXProcessor {
 		factory.setSchema(schema);
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
+		setFile(file);
 		gpxDoc = builder.parse(file);
 		routes = gpxDoc.getElementsByTagName(ROUTE);
 	}
@@ -48,25 +48,14 @@ public class GPXProcessor {
 		return routes;
 	}
 
-	public GPXProcessor addMarkers() throws InvalidAttributesException {
-		
-		return addMarkers(true);
-	}
 	
-	public GPXProcessor addMarkers(boolean forward) throws InvalidAttributesException {
-		
-		UnitConverter conv = UnitConverter.MILES;
-		conv.normalize((double) INTERVAL_BETWEEN_MARKERS);
-		addMarkers(conv, forward);
-		return this;
-	}
-	
-	public void addMarkers(UnitConverter converter, boolean forward) {
+	public void addMarkers() {
 		
 		for (int i = 0; i < routes.getLength(); i++) {
 			Element e = (Element) routes.item(i);
-			GPXRoute route = new GPXRoute(e, forward);
-			route.addMarkers(converter);
+			GPXRoute route = new GPXRoute(e, isForward());
+			
+			route.addMarkers(getExplicitInterval());
 		}
 
 	}
@@ -80,9 +69,10 @@ public class GPXProcessor {
 	}
 
 	
-	public void generateOutput(File file) throws  TransformerException {
+	public void generateOutput() throws  TransformerException {
 		
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		File file = getFile();
 		if (file.exists()) {
 			String path = file.getAbsolutePath();
 			File ren = new File(path + String.valueOf(new Date().getTime()));
@@ -94,4 +84,47 @@ public class GPXProcessor {
 		Source source = new DOMSource(gpxDoc);
 		transformer.transform(source, result);
 	}
+	
+
+	public String getDirection() {
+		return direction;
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+	
+	public boolean isForward() {
+		return "forward".equalsIgnoreCase(getDirection());
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public double getMarkerInterval() {
+		return markerInterval;
+	}
+
+	public void setMarkerInterval(double markerInterval) {
+		this.markerInterval = markerInterval;
+	}
+
+	public UnitConverter getIntervalUnit() {
+		return intervalUnit;
+	}
+
+	public void setIntervalUnit(UnitConverter intervalUnit) {
+		this.intervalUnit = intervalUnit;
+	}
+	private UnitConverter getExplicitInterval() {
+		
+		getIntervalUnit().normalize(getMarkerInterval());
+		return getIntervalUnit();
+	}
+
 }
