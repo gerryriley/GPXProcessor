@@ -80,11 +80,11 @@ public class GPXProcessor {
 		
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		GPXFile file = getFile();
-		GPXFile copy = file.createCopy();
-		if (copy == null)	 {
+		GPXFile original = file.renameFile();
+		if (original == null)	 {
 			throw new Exception("Unable to create a copy of the original GPX File before processing");
 		}
-		Result result = new StreamResult(file);
+		Result result = new StreamResult(original);
 		Source source = new DOMSource(gpxDoc);
 		transformer.transform(source, result);
 	}

@@ -1,7 +1,6 @@
 package uk.me.riley1.gpx.processor.core;
 
 import java.io.File;
-import java.io.IOException;
 
 public class GPXFile extends File {
 
@@ -16,25 +15,35 @@ public class GPXFile extends File {
 	private static final int MAX_COPIES = 100;
 
 	
-	public GPXFile createCopy() {
+	public GPXFile renameFile() {
 		
-		GPXFile copy = null;
 		int x = 1;
 		boolean success = false;
+		String name = getAbsolutePath();
+		GPXFile copy = new GPXFile(getAbsolutePath());
+		
 		do  {
-			try {
+				name = getAbsolutePath();
+				int i = name.lastIndexOf('.');
+				if (i > 1 && name.substring(i).length() > 2) {
+					String suffix = name.substring(i);
+					name = name.substring(0, i) + "(" + String.valueOf(x) + ")" + suffix;
+					File test = new File(name);
+					success = !test.exists();
+				} 
+				else {
+					name = name + String.valueOf(x);
+				}
 				
-					copy = new GPXFile(getAbsolutePath() + String.valueOf(x));
-					success = copy.createNewFile();
-				
-			} catch (IOException e) {
-				//ignore
-			}
-		} while (!success && x < MAX_COPIES);
+		} while (!success && x++ < MAX_COPIES);
 		
 		if (x >= MAX_COPIES) {
 			copy = null;
+		} else {
+			File renamed = new File(name);
+			renameTo(renamed);
 		}
+			
 		return copy;
 	}
 }
