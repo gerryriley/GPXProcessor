@@ -1,6 +1,5 @@
 package uk.me.riley1.gpx.processor.core;
 
-import java.io.File;
 
 public class GPXProcessorMain {
 
@@ -10,15 +9,14 @@ public class GPXProcessorMain {
 			System.exit(-1);
 		}
 		String fileName = args[0];
-		File file = new File(fileName);
+		GPXFile file = new GPXFile(fileName);
 		String direction = "backward";
 		if (args.length > 1) {
 			direction = args[1];
 		}
 		GPXProcessor proc;
 		try {
-			proc = new GPXProcessor(file);
-			proc.setDirection(direction);
+			proc = new GPXProcessor(file, direction);
 			proc.removeMarkers();
 			proc.addMarkers();
 			proc.generateOutput();

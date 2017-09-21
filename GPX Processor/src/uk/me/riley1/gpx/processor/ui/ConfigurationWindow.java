@@ -41,6 +41,7 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 	private JComboBox<String> cbFileName;
 	private JComboBox<String> cbDirection;
 	private JComboBox<UnitConverter> cbDistanceUnit;
+	private JLabel statusBar;
 
 	/**
 	 * Launch the application.
@@ -147,8 +148,8 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		btnAddMarkers.setBounds(267, 181, 113, 23);
 		panel.add(btnAddMarkers);
 		
-		btnCancel = new JButton("Cancel");
-		btnCancel.setToolTipText("Cancel this Operation");
+		btnCancel = new JButton("Close");
+		btnCancel.setToolTipText("Close this dialogue and exit the application");
 		btnCancel.addActionListener(this);
 		btnCancel.setFont(new Font("Arial", Font.BOLD, 12));
 		btnCancel.setForeground(SystemColor.textText);
@@ -156,6 +157,10 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		btnCancel.setEnabled(true);
 		btnCancel.setBounds(132, 181, 89, 23);
 		panel.add(btnCancel);
+		
+		statusBar = new JLabel("");
+		statusBar.setBounds(70, 229, 379, 14);
+		panel.add(statusBar);
 		
 	}
 
@@ -181,16 +186,22 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 
 	private void doAddMarkers() {
 
-		File file = new File((String) cbFileName.getSelectedItem());
+		GPXFile file = new GPXFile((String) cbFileName.getSelectedItem());
+		frmGpxFileAdd.setEnabled(false);
+		statusBar.setToolTipText("");
 		try {
-			GPXProcessor proc = new GPXProcessor(file);
-			proc.setDirection((String) cbDirection.getSelectedItem());
+			
+			GPXProcessor proc = new GPXProcessor(file, (String) cbDirection.getSelectedItem());
 			proc.setMarkerInterval(Double.parseDouble(tfDistance.getText()));
 			proc.setIntervalUnit((UnitConverter) cbDistanceUnit.getSelectedItem());
+			statusBar.setText("Removing any existing markers ...");
 			proc.removeMarkers();
+			statusBar.setText("Adding new markers ...");
 			proc.addMarkers();
+			statusBar.setText("Renaming input file and creating new output file ...");
 			proc.generateOutput();
-
+			statusBar.setText("Completed processing - " + file.getName());
+			frmGpxFileAdd.setEnabled(true);
 		}
 		catch (Exception e) {
 			displayException(e);
@@ -199,6 +210,8 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 
 	protected void displayException(Exception e) {
 		
+		frmGpxFileAdd.setEnabled(true);
+		statusBar.setToolTipText("");
 		Object[] options = {"OK", "Show Exception"};
 		int n = JOptionPane.showOptionDialog(frmGpxFileAdd,
 		"An Error has Occurred while processing your file:\n\n" + 

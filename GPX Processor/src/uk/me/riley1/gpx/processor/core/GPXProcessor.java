@@ -2,16 +2,15 @@ package uk.me.riley1.gpx.processor.core;
 
 import org.w3c.dom.*;
 
-import java.io.File;
 import java.net.URL;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.*;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -21,9 +20,9 @@ import javax.xml.validation.SchemaFactory;
 public class GPXProcessor {
 	
 	private Document gpxDoc;
-	private NodeList routes;
+	private List<GPXRoute> routes;
 	private String direction = "backward";
-	private File file;
+	private GPXFile file;
 	private double markerInterval = 1;
 	private UnitConverter intervalUnit = UnitConverter.MILES;
 	public static String ROUTE = "rte";
@@ -31,7 +30,7 @@ public class GPXProcessor {
 	public static String WP_NAME = "name";
 	public static String WP_SYM = "sym";
 	
-	public GPXProcessor(File file) throws Exception {
+	public GPXProcessor(GPXFile file, String direction) throws Exception {
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -41,19 +40,28 @@ public class GPXProcessor {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		setFile(file);
 		gpxDoc = builder.parse(file);
-		routes = gpxDoc.getElementsByTagName(ROUTE);
+		setDirection(direction);
+		setRoutes(gpxDoc.getElementsByTagName(ROUTE));
 	}
 
-	public NodeList getRoutes() {
+	public List<GPXRoute> getRoutes() {
+		
 		return routes;
+	}
+	
+	private void setRoutes(NodeList nL) {
+		
+		routes = new ArrayList<GPXRoute>();
+		for (int i = 0; i < nL.getLength(); i++) {
+			GPXRoute route = new GPXRoute((Element) nL.item(i), getDirection().equalsIgnoreCase("forward"));
+			routes.add(route);
+		}
 	}
 
 	
 	public void addMarkers() {
 		
-		for (int i = 0; i < routes.getLength(); i++) {
-			Element e = (Element) routes.item(i);
-			GPXRoute route = new GPXRoute(e, isForward());
+		for (GPXRoute route : getRoutes()) {
 			
 			route.addMarkers(getExplicitInterval());
 		}
@@ -61,48 +69,46 @@ public class GPXProcessor {
 	}
 	
 	public void removeMarkers() {
-		for (int i = 0; i < routes.getLength(); i++) {
-			Element e = (Element) routes.item(i);
-			GPXRoute route = new GPXRoute(e, true);
+		for (GPXRoute route : getRoutes()) {
+			
 			route.removeMarkers();
 		}
 	}
 
 	
-	public void generateOutput() throws  TransformerException {
+	public void generateOutput() throws  Exception {
 		
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		File file = getFile();
-		if (file.exists()) {
-			String path = file.getAbsolutePath();
-			File ren = new File(path + String.valueOf(new Date().getTime()));
-			file.renameTo(ren);
-			file = new File(path);
+		GPXFile file = getFile();
+		GPXFile copy = file.createCopy();
+		if (copy == null)	 {
+			throw new Exception("Unable to create a copy of the original GPX File before processing");
 		}
-				
 		Result result = new StreamResult(file);
 		Source source = new DOMSource(gpxDoc);
 		transformer.transform(source, result);
 	}
-	
 
 	public String getDirection() {
 		return direction;
 	}
 
 	public void setDirection(String direction) {
-		this.direction = direction;
+		
+		if (direction != null && (direction.equalsIgnoreCase("forward") || direction.equalsIgnoreCase("backward"))) {
+			this.direction = direction;
+		}
 	}
 	
 	public boolean isForward() {
 		return "forward".equalsIgnoreCase(getDirection());
 	}
 
-	public File getFile() {
+	public GPXFile getFile() {
 		return file;
 	}
 
-	public void setFile(File file) {
+	public void setFile(GPXFile file) {
 		this.file = file;
 	}
 
