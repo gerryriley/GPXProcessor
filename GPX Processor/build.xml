@@ -10,6 +10,7 @@
 	  <property name="src" location="src"/>
 	  <property name="build" location="build"/>
 	  <property name="dist" location="dist"/>
+	  <property name="name" value="GPXProcessor"/>
 
 	  <target name="init" depends="clean">
 	    <!-- Create the time stamp -->
@@ -27,10 +28,15 @@
 	  <target name="dist" depends="compile"
 	        description="generate the distribution">
 	    <!-- Create the distribution directory -->
-	    <mkdir dir="${dist}/lib"/>
+	    <mkdir dir="${dist}"/>
 
-	    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-	    <jar jarfile="${dist}/lib/MyProject-${DSTAMP}.jar" basedir="${build}"/>
+        <jar destfile="${dist}/${name}.jar" basedir="${build}" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="uk.me.riley1.gpx.processor.ui.ConfigurationWindow"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+        </jar>
+	  	<zip destfile="${name}.zip" basedir="." includes="*.bat, dist/*.jar"/>
 	  </target>
 
 	  <target name="clean"
