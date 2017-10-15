@@ -21,7 +21,7 @@ public class GPXProcessor {
 	
 	private Document gpxDoc;
 	private List<GPXRoute> routes;
-	private String direction = "backward";
+	private boolean direction = false;
 	private GPXFile file;
 	private double markerInterval = 1;
 	private UnitConverter intervalUnit = UnitConverter.MILES;
@@ -53,7 +53,7 @@ public class GPXProcessor {
 		
 		routes = new ArrayList<GPXRoute>();
 		for (int i = 0; i < nL.getLength(); i++) {
-			GPXRoute route = new GPXRoute((Element) nL.item(i), getDirection().equalsIgnoreCase("forward"));
+			GPXRoute route = new GPXRoute((Element) nL.item(i), isForward());
 			routes.add(route);
 		}
 	}
@@ -89,19 +89,16 @@ public class GPXProcessor {
 		transformer.transform(source, result);
 	}
 
-	public String getDirection() {
-		return direction;
-	}
-
 	public void setDirection(String direction) {
 		
-		if (direction != null && (direction.equalsIgnoreCase("forward") || direction.equalsIgnoreCase("backward"))) {
-			this.direction = direction;
+		if (direction != null) {
+			
+			 this.direction = direction.equalsIgnoreCase("forwards");
 		}
 	}
 	
 	public boolean isForward() {
-		return "forward".equalsIgnoreCase(getDirection());
+		return direction;
 	}
 
 	public GPXFile getFile() {
