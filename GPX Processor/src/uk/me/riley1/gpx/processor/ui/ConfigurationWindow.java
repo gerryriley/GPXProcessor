@@ -106,6 +106,7 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		addItems(cbDirection, new String[] {"Backwards", "Forwards"});
 		cbDirection.setSelectedIndex(0);
 		cbDirection.setBounds(176, 68, 109, 20);
+		cbDirection.addItemListener(this);
 		panel.add(cbDirection);
 		
 		JLabel lblDirection = new JLabel("Direction");
@@ -266,10 +267,12 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
+		
+		Object source = e.getSource();
 		String item = (String) e.getItem();
-		File file = new File(item);
-	
-            btnAddMarkers.setEnabled(file.isFile());
-			
+		if (source.equals(cbFileName)) {
+			File file = new File(item);
+			btnAddMarkers.setEnabled(file.isFile());
+		} 			
 	}
 }
