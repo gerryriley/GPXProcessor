@@ -36,7 +36,7 @@
                 <attribute name="Class-Path" value="."/>
             </manifest>
         </jar>
-	  	<zip destfile="${name}.zip" basedir="." includes="*.bat, dist/*.jar"/>
+	  	<!--<zip destfile="${name}.zip" basedir="." includes="*.bat, dist/*.jar"/>-->
 	  </target>
 
 	  <target name="clean"

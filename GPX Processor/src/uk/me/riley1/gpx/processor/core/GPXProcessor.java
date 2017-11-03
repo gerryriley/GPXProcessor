@@ -2,6 +2,8 @@ package uk.me.riley1.gpx.processor.core;
 
 import org.w3c.dom.*;
 
+import uk.me.riley1.gpx.processor.ui.ConfigurationWindow.Configuration;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +23,15 @@ public class GPXProcessor {
 	
 	private Document gpxDoc;
 	private List<GPXRoute> routes;
-	private boolean direction = false;
-	private GPXFile file;
 	private double markerInterval = 1;
+	private Configuration config;
 	private UnitConverter intervalUnit = UnitConverter.MILES;
 	public static String ROUTE = "rte";
 	public static String WAYPOINT = "rtept";
 	public static String WP_NAME = "name";
 	public static String WP_SYM = "sym";
 	
-	public GPXProcessor(GPXFile file, String direction) throws Exception {
+	public GPXProcessor(Configuration config) throws Exception {
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		SchemaFactory sFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -38,9 +39,8 @@ public class GPXProcessor {
 		factory.setSchema(schema);
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		setFile(file);
-		gpxDoc = builder.parse(file);
-		setDirection(direction);
+		this.config = config;
+		gpxDoc = builder.parse(getFile());
 		setRoutes(gpxDoc.getElementsByTagName(ROUTE));
 	}
 
@@ -89,25 +89,18 @@ public class GPXProcessor {
 		transformer.transform(source, result);
 	}
 
-	public void setDirection(String direction) {
-		
-		if (direction != null) {
-			
-			 this.direction = direction.equalsIgnoreCase("forwards");
-		}
-	}
-	
 	public boolean isForward() {
+		
+		String s = (String) config.get(Configuration.DIRECTION);
+		boolean direction = "forward".equalsIgnoreCase(s);
 		return direction;
 	}
 
 	public GPXFile getFile() {
-		return file;
+
+		return (GPXFile) config.get(Configuration.GPX_FILE);
 	}
 
-	public void setFile(GPXFile file) {
-		this.file = file;
-	}
 
 	public double getMarkerInterval() {
 		return markerInterval;
@@ -129,5 +122,11 @@ public class GPXProcessor {
 		getIntervalUnit().normalize(getMarkerInterval());
 		return getIntervalUnit();
 	}
+	
+	public boolean isStartFinish() {
+		
+		return (boolean) config.get(Configuration.START_FINISH);
+	}
+
 
 }
