@@ -23,13 +23,13 @@ public class GPXProcessor {
 	
 	private Document gpxDoc;
 	private List<GPXRoute> routes;
-	private double markerInterval = 1;
-	private Configuration config;
-	private UnitConverter intervalUnit = UnitConverter.MILES;
+	private Configuration configuration;
 	public static String ROUTE = "rte";
 	public static String WAYPOINT = "rtept";
 	public static String WP_NAME = "name";
 	public static String WP_SYM = "sym";
+	public static final String WP_EXTENSIONS = "extensions";
+	public static final String WP_COLOR = "color";
 	
 	public GPXProcessor(Configuration config) throws Exception {
 		
@@ -39,7 +39,7 @@ public class GPXProcessor {
 		factory.setSchema(schema);
 		factory.setNamespaceAware(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
-		this.config = config;
+		configuration = config;
 		gpxDoc = builder.parse(getFile());
 		setRoutes(gpxDoc.getElementsByTagName(ROUTE));
 	}
@@ -63,7 +63,7 @@ public class GPXProcessor {
 		
 		for (GPXRoute route : getRoutes()) {
 			
-			route.addMarkers(getExplicitInterval());
+			route.addMarkers(configuration);
 		}
 
 	}
@@ -91,41 +91,36 @@ public class GPXProcessor {
 
 	public boolean isForward() {
 		
-		String s = (String) config.get(Configuration.DIRECTION);
+		String s = configuration != null ? (String) configuration.get(Configuration.DIRECTION) : "backward";
 		boolean direction = "forward".equalsIgnoreCase(s);
 		return direction;
 	}
 
 	public GPXFile getFile() {
 
-		return (GPXFile) config.get(Configuration.GPX_FILE);
+		return configuration != null ? (GPXFile) configuration.get(Configuration.GPX_FILE) : null;
 	}
 
 
 	public double getMarkerInterval() {
-		return markerInterval;
-	}
-
-	public void setMarkerInterval(double markerInterval) {
-		this.markerInterval = markerInterval;
+		
+		return configuration != null ? (double) configuration.get(Configuration.DISTANCE) : 1;
 	}
 
 	public UnitConverter getIntervalUnit() {
-		return intervalUnit;
+		
+		return 	configuration != null ? (UnitConverter) configuration.get(Configuration.DISTANCE_UNIT) : UnitConverter.MILES;
 	}
 
-	public void setIntervalUnit(UnitConverter intervalUnit) {
-		this.intervalUnit = intervalUnit;
-	}
-	private UnitConverter getExplicitInterval() {
+	/*private UnitConverter getExplicitInterval() {
 		
 		getIntervalUnit().normalize(getMarkerInterval());
 		return getIntervalUnit();
-	}
+	}*/
 	
 	public boolean isStartFinish() {
 		
-		return (boolean) config.get(Configuration.START_FINISH);
+		return configuration != null ? (boolean) configuration.get(Configuration.START_FINISH) : false;
 	}
 
 

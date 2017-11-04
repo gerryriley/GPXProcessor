@@ -32,12 +32,16 @@ public class GPXWayPoints {
 		return wayPoint;
 	}
 
+	public GPXWayPoint getLastWayPoint() {
+		
+		index = nodeList.getLength() - 1;
+		return getNextWayPoint();
+	}
+	
 	public void insertWaypoint(GPXWayPoint newPt, GPXWayPoint refPt) {
 	
 		route.getElement().insertBefore(newPt.getElement(), refPt.getElement());
 		// backtrack on index to support the new way point.
 		index = route.isForward() ? --index : ++index;
 	}
-	
-
 }

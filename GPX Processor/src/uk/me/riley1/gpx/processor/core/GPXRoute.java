@@ -1,6 +1,10 @@
 package uk.me.riley1.gpx.processor.core;
 
+import java.awt.Color;
+
 import org.w3c.dom.Element;
+
+import uk.me.riley1.gpx.processor.ui.ConfigurationWindow.Configuration;
 
 public class GPXRoute {
 	
@@ -17,13 +21,16 @@ public class GPXRoute {
 	}
 	
 	
-	public void addMarkers(UnitConverter converter) {
+	public void addMarkers(Configuration config) {
 		
 		double markerDistance = 0;
 		double distance = 0L;
 		GPXWayPoints wayPoints = getWayPoints();
 		GPXWayPoint fromPt = wayPoints.getFirstWayPoint();
 		GPXWayPoint toPt = wayPoints.getNextWayPoint();
+		UnitConverter converter = (UnitConverter) config.get(Configuration.DISTANCE_UNIT);
+		boolean doStartFinishMarkers = (Boolean) config.get(Configuration.START_FINISH);
+		
 		while (fromPt != null && toPt != null) {
 			distance += fromPt.getDistanceBetweenPoints(toPt);
 			if (distance >= converter.getValue()) { // This is the unit value in meters.
@@ -66,6 +73,19 @@ public class GPXRoute {
 			}
 			fromPt = toPt;
 			toPt = wayPoints.getNextWayPoint();
+		}
+		
+		if (doStartFinishMarkers) {
+			
+			fromPt = wayPoints.getFirstWayPoint();
+			toPt = wayPoints.getLastWayPoint();
+			if (fromPt.getDistanceBetweenPoints(toPt) > 500) {
+				fromPt.UpdatePoint("Start", "Pin", Color.GREEN);
+				toPt.UpdatePoint("Finish", "Pin", Color.RED);
+			}
+			else {
+				fromPt.UpdatePoint("Start/Finish", "Pin", Color.GREEN);
+			}
 		}
 	}
 

@@ -1,5 +1,7 @@
 package uk.me.riley1.gpx.processor.core;
 
+import java.awt.Color;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -148,12 +150,18 @@ public class GPXWayPoint {
 		return newWayPoint;
 	}
 	
+	public void  UpdatePoint(String name, String symbolName) {
+		
+		UpdatePoint(name, symbolName, null);
+	}
+	
 	/**
 	 * Updates to parameters in this GPXWaypoint
-	 * @param name this value replaces the existing name of this waypoint
-	 * @param symbolName this value replaces the existing name of the symbol that visibly represents this waypoint
+	 * @param name this value replaces the existing name of this waypoint. ignored if null
+	 * @param symbolName this value replaces the existing name of the symbol that visibly represents this waypoint.. ignored if null
+	 * @param color the colour of the symbol if relevant. ignored if null
 	 */
-	public void UpdatePoint(String name, String symbolName) {
+	public void UpdatePoint(String name, String symbolName, Color color) {
 		
 		if (name != null) {
 			Element wpName = (Element) getElement().getElementsByTagName(GPXProcessor.WP_NAME).item(0);
@@ -165,6 +173,9 @@ public class GPXWayPoint {
 			Node text = sym.getFirstChild();
 			text.setNodeValue(symbolName);
 		}
+		if (color != null) {
+			updateColor(color);
+		}
 	}
 	
 	
@@ -174,6 +185,26 @@ public class GPXWayPoint {
 
 	public boolean isForward() {
 		return forward;
+	}
+	
+	public void updateColor(Color color) {
+		if (color != null) {
+			int rgb = color.getRGB();
+			String sColor = Integer.toHexString(rgb);
+			updateColor(sColor);
+		}
+	}
+	
+	private void updateColor(String sColor) {
+		
+		Element extensions = (Element) getElement().getElementsByTagName(GPXProcessor.WP_EXTENSIONS).item(0);
+		if (extensions != null) {
+			Element eColor = (Element) extensions.getElementsByTagName(GPXProcessor.WP_COLOR);
+			if (eColor != null && sColor != null) {
+				Node text = eColor.getFirstChild();
+				text.setNodeValue(sColor);				
+			}
+		}
 	}
 	
 	class Coordinates {

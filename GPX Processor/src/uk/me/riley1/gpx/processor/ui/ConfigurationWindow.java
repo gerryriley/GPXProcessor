@@ -29,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
 import java.awt.SystemColor;
@@ -203,9 +202,7 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		statusBar.setToolTipText("");
 		try {
 			
-			GPXProcessor proc = new GPXProcessor(configuration);
-			proc.setMarkerInterval(Double.parseDouble(tfDistance.getText()));
-			proc.setIntervalUnit((UnitConverter) cbDistanceUnit.getSelectedItem());
+			GPXProcessor proc = new GPXProcessor(config);
 			statusBar.setText("Removing any existing markers ...");
 			proc.removeMarkers();
 			statusBar.setText("Adding new markers ...");
@@ -289,16 +286,25 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 	
 	public static class Configuration extends HashMap<Integer, Object> {
 		
-		public static int DIRECTION = 1;
-		public static int START_FINISH = 2;
-		public static int GPX_FILE = 3;
+		private static final long serialVersionUID = 1L;
+		public static final int DIRECTION = 1;
+		public static final int START_FINISH = 2;
+		public static final int GPX_FILE = 3;
+		public static final int DISTANCE = 4;
+		public static final int DISTANCE_UNIT = 5;
 		
 		private Configuration(ConfigurationWindow window) {
 			
 			put(GPX_FILE, window.file);
-			put(DIRECTION, (String) window.cbFileName.getSelectedItem());
+			put(DIRECTION, window.cbFileName.getSelectedItem());
 			put(START_FINISH, window.chckbxSFM.isSelected());
+			put(DISTANCE, Double.parseDouble(window.tfDistance.getText()));
+			put(DISTANCE_UNIT, window.cbDistanceUnit.getSelectedItem());
 
+		}
+		
+		public Configuration() {
+			
 		}
 
 	}
