@@ -199,7 +199,7 @@ public class GPXWayPoint {
 		
 		Element extensions = (Element) getElement().getElementsByTagName(GPXProcessor.WP_EXTENSIONS).item(0);
 		if (extensions != null) {
-			Element eColor = (Element) extensions.getElementsByTagName(GPXProcessor.WP_COLOR);
+			Element eColor = (Element) extensions.getElementsByTagName(GPXProcessor.WP_COLOR).item(0);
 			if (eColor != null && sColor != null) {
 				Node text = eColor.getFirstChild();
 				text.setNodeValue(sColor);				
