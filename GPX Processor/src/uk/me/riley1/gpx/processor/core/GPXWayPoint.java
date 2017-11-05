@@ -88,6 +88,14 @@ public class GPXWayPoint {
 		return brng;
 	}
 	
+	/**
+	 * Gets the coordinates in degrees of a point that is between this point and otherPoint at with a 
+	 * distance from this point specified by the <b>distance</b> parameter.
+	 * @param otherPoint the other point from which we get the bearing
+	 * @param distance the distance from this point to a new point on the same bearing as to <b>otherPoint</b>
+	 * from which we get the coordinates
+	 * @return The coordinates of the new point.
+	 */
 	Coordinates getDestPoint(GPXWayPoint otherPoint, double distance) {
 		
 		Element fromPt = getElement();
@@ -128,6 +136,18 @@ public class GPXWayPoint {
 		}
 	}
 
+	/**
+	 * Creates a new {@link GPXWayPoint} that is a specified distance from <b>otherpoint</b>
+	 * but on the same bearing between <b>otherpoint</b> and this point
+	 * @param otherPoint The  {@link GPXWayPoint} that gives us the bearing to this {@link GPXWayPoint}
+	 * @param pointInterval the value of the distance in local units that specifies how far along a route
+	 * or how far to go to the end of the route that the new point with represent. It is uses to from the
+	 * name of the new {@link GPXWayPoint} e.g. 10 Miles or 400 Meters
+	 * 
+	 * @param distance the exact distance from 
+	 * @param converter
+	 * @return
+	 */
 	public GPXWayPoint createNewWaypoint(GPXWayPoint otherPoint, double pointInterval, double distance, UnitConverter converter) {
 		
 		Coordinates coords = otherPoint.getDestPoint(this, distance);
@@ -150,6 +170,11 @@ public class GPXWayPoint {
 		return newWayPoint;
 	}
 	
+	/**
+	 * Updates to parameters in this GPXWaypoint
+	 * @param name this value replaces the existing name of this waypoint. ignored if null
+	 * @param symbolName this value replaces the existing name of the symbol that visibly represents this waypoint. ignored if null
+	*/
 	public void  UpdatePoint(String name, String symbolName) {
 		
 		UpdatePoint(name, symbolName, null);
@@ -157,8 +182,9 @@ public class GPXWayPoint {
 	
 	/**
 	 * Updates to parameters in this GPXWaypoint
-	 * @param name this value replaces the existing name of this waypoint. ignored if null
-	 * @param symbolName this value replaces the existing name of the symbol that visibly represents this waypoint.. ignored if null
+	 * @param name this value replaces the existing name of this {@link GPXWayPoint}. ignored if null
+	 * @param symbolName this value replaces the existing name of the symbol that visibly represents this 
+	 * {@link GPXWayPoint}. ignored if null
 	 * @param color the colour of the symbol if relevant. ignored if null
 	 */
 	public void UpdatePoint(String name, String symbolName, Color color) {
@@ -187,11 +213,16 @@ public class GPXWayPoint {
 		return forward;
 	}
 	
+	/**
+	 * Updates the symbol colour of this {@link GPXWayPoint} using  
+	 * @param color the specified new color of the symbol as an sRGB {@link Color}
+	 */
 	public void updateColor(Color color) {
 		if (color != null) {
-			int rgb = color.getRGB();
-			String sColor = Integer.toHexString(rgb);
-			updateColor(sColor);
+			StringBuffer sColor = new StringBuffer(Integer.toHexString(color.getRed()));
+			sColor.append(Integer.toHexString(color.getGreen()));
+			sColor.append(Integer.toHexString(color.getBlue()));
+			updateColor(sColor.toString());
 		}
 	}
 	

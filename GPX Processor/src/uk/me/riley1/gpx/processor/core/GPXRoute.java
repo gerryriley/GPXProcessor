@@ -10,26 +10,26 @@ public class GPXRoute {
 	
 	private static final double MAX_OVERSHOOT = 10L;
 	private Element thisElement;
-	private boolean forward;
+	private Configuration configuration;
 	private GPXWayPoints wayPoints;
 	
 
-	public GPXRoute(Element route, boolean forward) {
+	public GPXRoute(Element route, Configuration config) {
 		thisElement = route;
-		this.forward = forward;
 		wayPoints = new GPXWayPoints(this);
+		this.configuration = config;
 	}
 	
 	
-	public void addMarkers(Configuration config) {
+	public void addMarkers() {
 		
 		double markerDistance = 0;
 		double distance = 0L;
 		GPXWayPoints wayPoints = getWayPoints();
-		GPXWayPoint fromPt = wayPoints.getFirstWayPoint();
+		GPXWayPoint fromPt = wayPoints.getFirstWayPoint(isForward());
 		GPXWayPoint toPt = wayPoints.getNextWayPoint();
-		UnitConverter converter = (UnitConverter) config.get(Configuration.DISTANCE_UNIT);
-		boolean doStartFinishMarkers = (Boolean) config.get(Configuration.START_FINISH);
+		UnitConverter converter = (UnitConverter) configuration.get(Configuration.DISTANCE_UNIT);
+		boolean doStartFinishMarkers = (Boolean) configuration.get(Configuration.START_FINISH);
 		
 		while (fromPt != null && toPt != null) {
 			distance += fromPt.getDistanceBetweenPoints(toPt);
@@ -48,7 +48,7 @@ public class GPXRoute {
 					 * If we are doing distance covered i.e. forward then need to insert the new waypoint
 					 * before the next point.
 					 */
-					if (forward) {
+					if (isForward()) {
 						wayPoints.insertWaypoint(newPt, toPt);
 					}
 					/* 
@@ -77,8 +77,9 @@ public class GPXRoute {
 		
 		if (doStartFinishMarkers) {
 			
-			fromPt = wayPoints.getFirstWayPoint();
-			toPt = wayPoints.getLastWayPoint();
+			fromPt = wayPoints.getFirstWayPoint(true);
+			toPt = wayPoints.getLastWayPoint(true);
+			
 			if (fromPt.getDistanceBetweenPoints(toPt) > 500) {
 				fromPt.UpdatePoint("Start", "Pin", Color.GREEN);
 				toPt.UpdatePoint("Finish", "Pin", Color.RED);
@@ -92,7 +93,7 @@ public class GPXRoute {
 	public void removeMarkers() {
 		
 		GPXWayPoints wayPoints = getWayPoints();
-		GPXWayPoint fromPt = wayPoints.getFirstWayPoint();
+		GPXWayPoint fromPt = wayPoints.getFirstWayPoint(isForward());
 		while (fromPt != null) {
 			fromPt.removeMarker();
 			fromPt = wayPoints.getNextWayPoint();
@@ -105,7 +106,10 @@ public class GPXRoute {
 	}
 
 	public boolean isForward() {
-		return forward;
+		
+		String s = configuration != null ? (String) configuration.get(Configuration.DIRECTION) : "backward";
+		boolean direction = "forwards".equalsIgnoreCase(s);
+		return direction;
 	}
 
 	public GPXWayPoints getWayPoints() {

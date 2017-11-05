@@ -290,16 +290,17 @@ public class ConfigurationWindow implements ActionListener, PopupMenuListener, I
 		public static final int DIRECTION = 1;
 		public static final int START_FINISH = 2;
 		public static final int GPX_FILE = 3;
-		public static final int DISTANCE = 4;
 		public static final int DISTANCE_UNIT = 5;
 		
 		private Configuration(ConfigurationWindow window) {
 			
 			put(GPX_FILE, window.file);
-			put(DIRECTION, window.cbFileName.getSelectedItem());
+			put(DIRECTION, window.cbDirection.getSelectedItem());
 			put(START_FINISH, window.chckbxSFM.isSelected());
-			put(DISTANCE, Double.parseDouble(window.tfDistance.getText()));
-			put(DISTANCE_UNIT, window.cbDistanceUnit.getSelectedItem());
+			double interval = Double.parseDouble(window.tfDistance.getText());
+			UnitConverter distUnit = (UnitConverter) window.cbDistanceUnit.getSelectedItem();
+			distUnit.normalize(interval);
+			put(DISTANCE_UNIT, distUnit);
 
 		}
 		

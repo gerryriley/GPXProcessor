@@ -53,7 +53,7 @@ public class GPXProcessor {
 		
 		routes = new ArrayList<GPXRoute>();
 		for (int i = 0; i < nL.getLength(); i++) {
-			GPXRoute route = new GPXRoute((Element) nL.item(i), isForward());
+			GPXRoute route = new GPXRoute((Element) nL.item(i), configuration);
 			routes.add(route);
 		}
 	}
@@ -63,7 +63,7 @@ public class GPXProcessor {
 		
 		for (GPXRoute route : getRoutes()) {
 			
-			route.addMarkers(configuration);
+			route.addMarkers();
 		}
 
 	}
@@ -89,34 +89,22 @@ public class GPXProcessor {
 		transformer.transform(source, result);
 	}
 
-	public boolean isForward() {
-		
-		String s = configuration != null ? (String) configuration.get(Configuration.DIRECTION) : "backward";
-		boolean direction = "forward".equalsIgnoreCase(s);
-		return direction;
-	}
-
 	public GPXFile getFile() {
 
 		return configuration != null ? (GPXFile) configuration.get(Configuration.GPX_FILE) : null;
 	}
 
-
+	/*
 	public double getMarkerInterval() {
 		
 		return configuration != null ? (double) configuration.get(Configuration.DISTANCE) : 1;
 	}
-
+	*/
 	public UnitConverter getIntervalUnit() {
 		
 		return 	configuration != null ? (UnitConverter) configuration.get(Configuration.DISTANCE_UNIT) : UnitConverter.MILES;
 	}
 
-	/*private UnitConverter getExplicitInterval() {
-		
-		getIntervalUnit().normalize(getMarkerInterval());
-		return getIntervalUnit();
-	}*/
 	
 	public boolean isStartFinish() {
 		

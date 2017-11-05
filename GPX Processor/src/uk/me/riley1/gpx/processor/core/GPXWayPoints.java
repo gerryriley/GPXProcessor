@@ -15,9 +15,9 @@ public class GPXWayPoints {
 		index = route.isForward() ? 0 : nodeList.getLength() - 1;
 	}
 	
-	public GPXWayPoint getFirstWayPoint() {
+	public GPXWayPoint getFirstWayPoint(boolean direction) {
 		
-		index = route.isForward() ? 0 : nodeList.getLength() - 1;
+		index = direction ? 0 : nodeList.getLength() - 1;
 		return getNextWayPoint();
 	}
 	
@@ -32,9 +32,9 @@ public class GPXWayPoints {
 		return wayPoint;
 	}
 
-	public GPXWayPoint getLastWayPoint() {
+	public GPXWayPoint getLastWayPoint(boolean direction) {
 		
-		index = nodeList.getLength() - 1;
+		index = direction ? nodeList.getLength() - 1 : 0;
 		return getNextWayPoint();
 	}
 	
@@ -42,6 +42,6 @@ public class GPXWayPoints {
 	
 		route.getElement().insertBefore(newPt.getElement(), refPt.getElement());
 		// backtrack on index to support the new way point.
-		index = route.isForward() ? ++index : --index;
+		//index = route.isForward() ? --index : --index;
 	}
 }
