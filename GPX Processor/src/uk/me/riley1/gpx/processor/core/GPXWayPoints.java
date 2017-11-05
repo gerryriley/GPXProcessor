@@ -42,6 +42,6 @@ public class GPXWayPoints {
 	
 		route.getElement().insertBefore(newPt.getElement(), refPt.getElement());
 		// backtrack on index to support the new way point.
-		//index = route.isForward() ? --index : --index;
+		index = route.isForward() ? index : ++index;
 	}
 }

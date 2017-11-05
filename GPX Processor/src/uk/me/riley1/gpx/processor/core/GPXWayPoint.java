@@ -1,6 +1,7 @@
 package uk.me.riley1.gpx.processor.core;
 
 import java.awt.Color;
+import java.util.Formatter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -219,9 +220,10 @@ public class GPXWayPoint {
 	 */
 	public void updateColor(Color color) {
 		if (color != null) {
-			StringBuffer sColor = new StringBuffer(Integer.toHexString(color.getRed()));
-			sColor.append(Integer.toHexString(color.getGreen()));
-			sColor.append(Integer.toHexString(color.getBlue()));
+			StringBuffer sColor = new StringBuffer();
+			Formatter format = new Formatter(sColor);
+			format.format("%1$02X%2$02X%3$02X",color.getRed(), color.getGreen(), color.getBlue());
+			format.close();
 			updateColor(sColor.toString());
 		}
 	}
@@ -233,7 +235,7 @@ public class GPXWayPoint {
 			Element eColor = (Element) extensions.getElementsByTagName(GPXProcessor.WP_COLOR).item(0);
 			if (eColor != null && sColor != null) {
 				Node text = eColor.getFirstChild();
-				text.setNodeValue(sColor);				
+				text.setNodeValue(sColor);
 			}
 		}
 	}
